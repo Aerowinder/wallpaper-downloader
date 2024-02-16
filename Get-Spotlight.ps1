@@ -1,9 +1,15 @@
-#User customizable variables#
+param([Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)][string]$destination)
+
+if (Test-Path $destination){
+    $dst_path_1080 = "$destination\1080x1920\"
+    $dst_path_1920 = "$destination\1920x1080\"
+    $dst_path_3840 = "$destination\3840x2160\"
+} else {
+    Write-Host "ERROR: Provided destination folder does not exist." -ForegroundColor Red
+    exit
+}
+
 $src_path = "$($env:LOCALAPPDATA)\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\Assets"
-$dst_path_1080 = "$($env:ONEDRIVE)\Private\Wallpaper\1080x1920\"
-$dst_path_1920 = "$($env:ONEDRIVE)\Private\Wallpaper\1920x1080\"
-$dst_path_3840 = "$($env:ONEDRIVE)\Private\Wallpaper\3840x2160\"
-#############################
 
 foreach ($i in Get-ChildItem -Path $src_path) {
     $image = New-Object System.Drawing.Bitmap $i.Fullname
@@ -20,3 +26,4 @@ foreach ($i in Get-ChildItem -Path $src_path) {
 
 #Changelog
 #2024-02-09 - AS - v1, First release.
+#2024-02-16 - As - v2, Commandline destination required for compatibility in multiple locations.
