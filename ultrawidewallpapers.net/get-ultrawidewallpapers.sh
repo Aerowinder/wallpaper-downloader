@@ -1,10 +1,34 @@
 #!/bin/bash
 
-# Base URL and output directory
+# Base URL and minimum file size allowed
 BASE_URL="https://www.ultrawidewallpapers.net/wallpapers/329/highres"
-OUTPUT_DIR="/mnt/private/Wallpaper/ultrawidewallpapers.net/7680x2160/"
-STATE_FILE="./.last_download" # File to track last attempted download
 MIN_SIZE=102400 # Minimum file size in bytes (100 KB)
+
+usage() {
+    echo
+    echo "USAGE:        $0 -o OUTPUT_DIR"
+    echo "EXAMPLE:      $0 -o /home/adam/wallpaper"
+    echo
+    echo "OUTPUT_DIR:   Must be writable; script will create"
+    echo
+    exit 1
+}
+
+# Parse options
+while getopts "o:s:" opt; do
+    case $opt in
+        o) OUTPUT_DIR="$OPTARG" ;;
+        *) usage ;;
+    esac
+done
+STATE_FILE="$OUTPUT_DIR/.state" # File to track last attempted download
+
+# Ensure output directory exists
+mkdir -p $OUTPUT_DIR
+if [[ ! -d "$OUTPUT_DIR" ]]; then
+    echo "Error: Output directory does not exist: $OUTPUT_DIR"
+    usage
+fi
 
 # Read starting point from state file or default to 1
 if [[ -f "$STATE_FILE" ]]; then
@@ -15,13 +39,7 @@ else
     echo "Starting fresh from ID: $START"
 fi
 
-# Ensure output directory exists
-if [[ ! -d "$OUTPUT_DIR" ]]; then
-    echo "Error: Output directory does not exist: $OUTPUT_DIR"
-    exit 1
-fi
-
-# Loop from last known good point to 5000
+# Loop from last known good point to 9999
 for ((i=START; i<=9999; i++)); do
     FILE_NAME="aishot-$i.jpg"
     URL="$BASE_URL/$FILE_NAME"
@@ -48,4 +66,4 @@ for ((i=START; i<=9999; i++)); do
 done
 
 #Changelog
-#2025-05-20 - AS - v1, First release.
+#2025-05-21 - AS - v1, First release.
